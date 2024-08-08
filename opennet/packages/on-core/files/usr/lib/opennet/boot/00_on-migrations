@@ -63,12 +63,11 @@ remove_wifidog_config() {
 
 ## @fn enable_uhttpd_redirect()
 ## @brief Aktiviere die automatische https-Weiterleitung
-## @details Bei einer Aktualisierung von v0.5.1 auf v0.5.2 fehlt diese Einstellung andernfalls, da
-##   zuvor keine https-Unterstützung in der Firmware aktiviert war.
+## @details Die Einstellung ist per default nicht aktiviert.
 enable_uhttpd_redirect() {
 	trap 'error_trap enable_uhttpd_redirect "$*"' EXIT
 	local uci_key="uhttpd.main.redirect_https"
-	[ -n "$(uci_get "$uci_key")" ] && return 0
+	[ "$(uci_get "$uci_key")" = "1" ] && return 0
 	uci set "$uci_key=1"
 	uci commit uhttpd
 	reload_config
