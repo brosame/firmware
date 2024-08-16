@@ -61,20 +61,6 @@ remove_wifidog_config() {
 }
 
 
-## @fn enable_uhttpd_redirect()
-## @brief Aktiviere die automatische https-Weiterleitung
-## @details Bei einer Aktualisierung von v0.5.1 auf v0.5.2 fehlt diese Einstellung andernfalls, da
-##   zuvor keine https-Unterstützung in der Firmware aktiviert war.
-enable_uhttpd_redirect() {
-	trap 'error_trap enable_uhttpd_redirect "$*"' EXIT
-	local uci_key="uhttpd.main.redirect_https"
-	[ -n "$(uci_get "$uci_key")" ] && return 0
-	uci set "$uci_key=1"
-	uci commit uhttpd
-	reload_config
-}
-
-
 ## @fn guess_previously_used_modules()
 ## @brief Versuche nach der Aktualisierung von einer Version vor v0.5.2 die zuvor verwendeten Module zu erraten.
 ## @details Die Firmware-Versionen vor v0.5.2 enthielten alle Module vorinstalliert. Ab v0.5.2 werden Module bei
@@ -168,32 +154,11 @@ EOF
 }
 
 
-## @fn update_uhttpd_configuration()
-## @brief Setze fehlende Einstellungen in /etc/config/uhttpd.
-## @details Seit v0.5.5 sind in der Upstream-Konfiguration die beiden Einstellungen
-##     "uhttpd.main.lua_prefix" und "uhttpd.main.lua_handler" gesetzt. Bei der Aktualisierung von
-##     einer älteren Firmware fehlen diese Einstellungen naturgemäß.
-##     Ohne diese Einstellungen wird ein HTTP-Request des root-Pfads ("/") mit einer Umleitung nach
-##     /luci beantwortet, obwohl uhttpd (per default) auf /cgi-bin/luci lauscht.
-update_uhttpd_configuration() {
-	trap 'error_trap update_uhttpd_configuration "$*"' EXIT
-	[ -e "/etc/config/uhttpd" ] || return 0
-	[ -z "$(uci_get "uhttpd.main.lua_prefix")" ] || return 0
-	[ -z "$(uci_get "uhttpd.main.lua_handler")" ] || return 0
-	uci set "uhttpd.main.lua_prefix=/luci"
-	uci set "uhttpd.main.lua_handler=/usr/lib/lua/luci/sgi/uhttpd.lua"
-	uci commit uhttpd
-	reload_config
-}
-
-
 migrate_uci_definition_changes
 # die Pruefung muss vor der Loeschung der wifidog-Konfiguration stattfinden
 guess_previously_used_modules
 remove_wifidog_config
-enable_uhttpd_redirect
 auto_enable_on_free_network
 rename_gpio_switch_poe_passthrough
 rename_tun_to_tun_on_user
 update_olsrd_plugin_versions
-update_uhttpd_configuration
