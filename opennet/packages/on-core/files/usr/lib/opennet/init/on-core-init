@@ -111,6 +111,19 @@ reduce_uhttpd_requests() {
 }
 
 
+## @fn enable_uhttpd_redirect()
+## @brief Aktiviere die automatische https-Weiterleitung
+## @details Die Einstellung ist per default nicht aktiviert.
+enable_uhttpd_redirect() {
+	trap 'error_trap enable_uhttpd_redirect "$*"' EXIT
+	local uci_key="uhttpd.main.redirect_https"
+	[ "$(uci_get "$uci_key")" = "1" ] && return 0
+	uci set "$uci_key=1"
+	uci commit uhttpd
+	reload_config
+}
+
+
 add_default_settings
 disable_cron_logging
 configure_dnsmasq
@@ -119,3 +132,4 @@ set_timezone_berlin
 enable_firewall_reload_trigger
 enable_default_modules
 reduce_uhttpd_requests
+enable_uhttpd_redirect
