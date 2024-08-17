@@ -1,13 +1,13 @@
 #!/bin/sh
 #
-# Dieses Skript enthaelt Funktionen, die fuer Updates altes Firmware-Versionen notwendig sind.
+# Dieses Skript enthaelt Funktionen, die fuer Updates alter Firmware-Versionen notwendig sind.
 # Alle Funktionen muessen idempotent sein.
 #
-# Dieses Skript wird nach jedem Booten ausgeführt.
-# Damit ermöglichen wir das Laden eines alten Backups auf eine neue Firmware.
+# Dieses Skript wird nach jedem Booten ausgefuehrt.
+# Damit ermoeglichen wir das Laden eines alten Backups auf eine neue Firmware.
 # Ausserdem wird dieses Skript als Teil des uci-defaults-Konzepts beim ersten Booten nach einer
 # Aktualisierung ausgefuehrt. Dies ist erforderlich, um alle notwendigen Vorbereitungen fuer
-# die erste Ausfuehrung des "on-core"-Init-Skripts zu treffen (z.B. crontab-Einrichtung).
+# die erste Ausfuehrung der "on-core"-Init-Skripte zu treffen (z.B. crontab-Einrichtung).
 #
 
 
@@ -22,9 +22,9 @@ _convert_uci_option_to_list() {
 	local optname="$2"
 	local filename="/etc/config/$config"
 	# Zeilen der Form "  option $optname 'foo bar'" werden in mehrere "  option $optname '$ITEM'"-Zeilen verwandelt
-	# Wir korrigieren dabei sowohl "option"- als auch "list"-Elemente sofern ihr Inhalt Leerzeichen enthält.
-	# Dies ist notwendig, da schon vor dem Ausführen dieses Migrationsskripts beim Booten "uci add_list" angewandt
-	# wird - dies verwandelt die Leerzeichen-separierte alte "option" in eine unveränderte "list". Also müssen wir
+	# Wir korrigieren dabei sowohl "option"- als auch "list"-Elemente sofern ihr Inhalt Leerzeichen enthaelt.
+	# Dies ist notwendig, da schon vor dem Ausfuehren dieses Migrationsskripts beim Booten "uci add_list" angewandt
+	# wird - dies verwandelt die Leerzeichen-separierte alte "option" in eine unveraenderte "list". Also muessen wir
 	# leider blind nachkorrigieren :(
 	awk '{
 		if ((($1 == "option") || ($1 == "list")) && ($2 == "'"$optname"'")) {
@@ -41,7 +41,7 @@ _convert_uci_option_to_list() {
 }
 
 
-# Gelegentlich ändert openwrt die Definition einzelner Variablen. Dies müssen wir via Migration nachbereiten.
+# Gelegentlich aendert openwrt die Definition einzelner Variablen. Dies muessen wir via Migration nachbereiten.
 migrate_uci_definition_changes() {
 	trap 'error_trap migrate_uci_definition_changes "$*"' EXIT
 	# vor Barrier Breaker war "firewall.ZONE.network" eine "option" - anschliessed wurde es zur "list"
@@ -63,8 +63,8 @@ auto_enable_on_free_network() {
 
 ## @fn rename_gpio_switch_poe_passthrough
 ## @brief Im Dezember 2015 (siehe 67e1c8701215724dcee9fabcbd7a397ea76e1a9d) wurde im openwrt-
-##        Repository das Config-Sektions-Präfix 'gpio_switch_' von steuerbaren GPIO-Signalen
-##        entfernt. Somit wollen wir auf Geräten mit alten Einstellungen diese über die neu
+##        Repository das Config-Sektions-Praefix 'gpio_switch_' von steuerbaren GPIO-Signalen
+##        entfernt. Somit wollen wir auf Geraeten mit alten Einstellungen diese ueber die neu
 ##        generierten Vorgabeeinstellungen schreiben.
 rename_gpio_switch_poe_passthrough() {
 	# keine alten Einstellungen? Nichts zu tun ...
