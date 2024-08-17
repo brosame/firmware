@@ -50,45 +50,6 @@ migrate_uci_definition_changes() {
 }
 
 
-## @fn remove_wifidog_config()
-## @brief Lösche die nicht mehr verwendete Konfiguration von "wifidog" und "on-wifidog".
-## @details Die Konfiguration enthält keine relevanten Inhalte mehr, die zu übertragen wären.
-remove_wifidog_config() {
-	trap 'error_trap remove_wifidog_config "$*"' EXIT
-	rm -f /etc/config/on-wifidog
-	uci_delete luci.flash_keep.wifidog
-	rm -f /etc/wifidog.conf
-}
-
-
-## @fn guess_previously_used_modules()
-## @brief Versuche nach der Aktualisierung von einer Version vor v0.5.2 die zuvor verwendeten Module zu erraten.
-## @details Die Firmware-Versionen vor v0.5.2 enthielten alle Module vorinstalliert. Ab v0.5.2 werden Module bei
-##   Bedarf nachinstalliert. Beim Übergang von Komplett- zu Bedarfsinstallation versuchen wir die vorherige
-##   Nutzungsform zu erraten und die dazu passende Modulliste zu speichern.
-guess_previously_used_modules() {
-	trap 'error_trap guess_previously_used_modules "$*"' EXIT
-	local module
-	# falls bereits etwas in der uci-Sektion gespeichert wurde, ist keine Nachbereitung noetig
-	[ -n "$(uci -q show "on-core.modules")" ] && return 0
-	# Zweig anlegen
-	uci set "on-core.modules=modules"
-	# prüfe ob relevante Dateien vorhanden sind, die die jeweiligen Module benutzen würden
-	[ -e "/etc/openvpn/opennet_user/on_aps.crt" ] \
-		&& uci_add_list "on-core.modules.installed" "on-openvpn"
-	[ -e "/etc/openvpn/opennet_ugw/on_aps.crt" ] \
-		&& uci_add_list "on-core.modules.installed" "on-usergw"
-	[ -e "/etc/wifidog.conf" ] \
-		&& uci_add_list "on-core.modules.installed" "on-captive-portal"
-	[ -e "/etc/xinetd.d/munin" ] \
-		&& uci_add_list "on-core.modules.installed" "on-monitoring"
-	# enable default modules
-	for module in $DEFAULT_MODULES_ENABLED; do
-		enable_on_module "$module"
-	done
-}
-
-
 ## @fn auto_enable_on_free_network()
 ## @brief In v0.5.2 wurde das on-free-Netzwerk als auto=0 konfiguriert. Darauffolgende Versionen
 ##        erwarten auto=1.
@@ -154,10 +115,7 @@ EOF
 }
 
 
-migrate_uci_definition_changes
-# die Pruefung muss vor der Loeschung der wifidog-Konfiguration stattfinden
-guess_previously_used_modules
-remove_wifidog_config
+#migrate_uci_definition_changes
 auto_enable_on_free_network
 rename_gpio_switch_poe_passthrough
 rename_tun_to_tun_on_user
