@@ -50,6 +50,19 @@ migrate_uci_definition_changes() {
 }
 
 
+## @fn enable_uhttpd_redirect()
+## @brief Aktiviere die automatische https-Weiterleitung
+## @details Die Einstellung ist per default nicht aktiviert.
+enable_uhttpd_redirect() {
+	trap 'error_trap enable_uhttpd_redirect "$*"' EXIT
+	local uci_key="uhttpd.main.redirect_https"
+	[ "$(uci_get "$uci_key")" = "1" ] && return 0
+	uci set "$uci_key=1"
+	uci commit uhttpd
+	reload_config
+}
+
+
 ## @fn auto_enable_on_free_network()
 ## @brief In v0.5.2 wurde das on-free-Netzwerk als auto=0 konfiguriert. Darauffolgende Versionen
 ##        erwarten auto=1.
@@ -115,7 +128,8 @@ EOF
 }
 
 
-#migrate_uci_definition_changes
+migrate_uci_definition_changes
+enable_uhttpd_redirect
 auto_enable_on_free_network
 rename_gpio_switch_poe_passthrough
 rename_tun_to_tun_on_user
