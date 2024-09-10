@@ -1,6 +1,6 @@
 # Security Policy
 
-Basic information for all "Opennet Initiative e.V." code repositories. 
+Basic information for all "Opennet Initiative e.V." code repositories.
 
 * Website: https://www.opennet-initiative.de/
 * Opennet DEV Team: https://wiki.opennet-initiative.de/wiki/Opennet_DEV
@@ -11,7 +11,7 @@ We support all versions inside this repository for security updates and any impr
 
 ## Reporting a Vulnerability
 
-Please kindly open a issue (with or without a pull-request) for this repository. 
+Please kindly open a issue (with or without a pull-request) for this repository.
 
 You can also reach us directly, please see our contact options here:
 https://wiki.opennet-initiative.de/wiki/Impressum
