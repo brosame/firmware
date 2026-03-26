@@ -10,6 +10,5 @@ regdb_prohibit-tdwr-channels.patch
 radar_counter.patch
 olsrd_del_pud.patch
 muninlite.patch
-flash_new_ubnt_wa.patch
 luci-olsr-menu.patch
 oonf-olsrd2_override.patch
