@@ -48,7 +48,7 @@ convert_mac_to_eui64_address() {
 ## @fn get_main_ipv6_address()
 ## @brief Ermittle die IPv6-Adresse des APs anhand des EUI64-Verfahrens.
 get_main_ipv6_address() {
-	request_olsrd2_txtinfo "olsrv2info" "originator" | grep ':'
+	printf "%s/%s" "$(convert_mac_to_eui64_address "$IP6_PREFIX_PERM" "$(get_mac_address)")" "$IP6_PREFIX_LENGTH"
 }
 
 
@@ -78,7 +78,7 @@ update_olsr2_interfaces() {
 	local phy_dev
 	# auf IPv6 begrenzen (siehe http://www.olsr.org/mediawiki/index.php/OLSR_network_deployments)
 	local ipv6_limit="-0.0.0.0/0 -::1/128 default_accept"
-	interfaces="$NETWORK_LOOPBACK wlan0 $(get_zone_log_interfaces "$ZONE_MESH") $(get_zone_raw_devices "$ZONE_MESH")"
+	interfaces="$NETWORK_LOOPBACK $(get_zone_log_interfaces "$ZONE_MESH") $(get_zone_raw_devices "$ZONE_MESH")"
 	# alle konfigurierten Interfaces durchgehen und überflüssige löschen
 	for uci_prefix in $(find_all_uci_sections "olsrd2" "interface"); do
 		# seit olsrd2 v0.12 benötigen wir "ifname" nicht mehr
@@ -245,7 +245,7 @@ init_policy_routing_ipv6() {
 
 
 request_olsrd2_txtinfo() {
-	echo "/$*" | timeout 4 nc localhost 2009 2>/dev/null
+	echo "/$*" | timeout 2 nc localhost 2009 2>/dev/null
 }
 
 
